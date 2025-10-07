@@ -6,6 +6,7 @@ extends CharacterBody2D
 @export var drag: float = 6.0
 @export var dash_speed: float = 480.0
 @export var dash_cooldown: float = 0.5
+@export var auto_forward_speed: float = 180.0
 
 @export_category("Mass")
 @export var base_mass: float = 1.0
@@ -17,13 +18,11 @@ extends CharacterBody2D
 @export_category("UI")
 @export_node_path("Label") var mass_label_path: NodePath
 
-@export_category("Level")
-@export var movement_bounds: Rect2 = Rect2(Vector2(-256, -360), Vector2(512, 720))
-
 var mass: float
 var _target_scale: float
 var _mass_label: Label
 var _dash_timer: float = 0.0
+var _movement_bounds: Rect2
 
 func _ready() -> void:
 	if not is_in_group("player"):
@@ -51,12 +50,19 @@ func _handle_movement(delta: float) -> void:
 	var input_vector := Vector2.ZERO
 	input_vector.x = Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
 	input_vector.y = Input.get_action_strength("move_down") - Input.get_action_strength("move_up")
+	input_vector.y = min(input_vector.y, 0.0)
 	if input_vector.length_squared() > 0:
 		input_vector = input_vector.normalized()
-	var desired_velocity := input_vector * move_speed
+	var desired_velocity := Vector2(
+		input_vector.x * move_speed,
+		input_vector.y * move_speed - auto_forward_speed
+	)
 	velocity = velocity.lerp(desired_velocity, clamp(acceleration * delta, 0.0, 1.0))
 	if input_vector == Vector2.ZERO:
-		velocity = velocity.lerp(Vector2.ZERO, clamp(drag * delta, 0.0, 1.0))
+		var idle_target := Vector2(0.0, -auto_forward_speed)
+		velocity = velocity.lerp(idle_target, clamp(drag * delta, 0.0, 1.0))
+	if velocity.y > -auto_forward_speed:
+		velocity.y = lerp(velocity.y, -auto_forward_speed, clamp(acceleration * delta, 0.0, 1.0))
 	move_and_slide()
 	_clamp_to_bounds()
 
@@ -89,15 +95,20 @@ func _perform_dash() -> void:
 		direction = Vector2.RIGHT
 	velocity = direction * dash_speed
 
+func set_movement_bounds(bounds: Rect2) -> void:
+	_movement_bounds = bounds
+
 func _clamp_to_bounds() -> void:
-	if movement_bounds.size == Vector2.ZERO:
+	if _movement_bounds.size == Vector2.ZERO:
 		return
-	var min_x := movement_bounds.position.x
-	var min_y := movement_bounds.position.y
-	var max_x := movement_bounds.position.x + movement_bounds.size.x
-	var max_y := movement_bounds.position.y + movement_bounds.size.y
+	var min_corner := _movement_bounds.position
+	var max_corner := _movement_bounds.position + _movement_bounds.size
+	var original_position := global_position
 	var clamped_position := Vector2(
-		clamp(global_position.x, min_x, max_x),
-		clamp(global_position.y, min_y, max_y)
+		clamp(original_position.x, min_corner.x, max_corner.x),
+		clamp(original_position.y, min_corner.y, max_corner.y)
 	)
 	global_position = clamped_position
+	var bottom := max_corner.y
+	if original_position.y >= bottom and is_equal_approx(clamped_position.y, bottom):
+		velocity.y = min(velocity.y, -auto_forward_speed)

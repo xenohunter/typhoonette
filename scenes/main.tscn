@@ -17,6 +17,7 @@ level_length = 3200.0
 horizontal_spawn_range = Vector2(-220, 220)
 spawn_distance = 560.0
 crate_scene = ExtResource("3_1h4fp")
+play_area_margin = Vector2(64, 240)
 
 [node name="World" type="Node2D" parent="."]
 
@@ -42,6 +43,7 @@ script = ExtResource("1_m1v6b")
 mass_label_path = NodePath("../../HUD/MassLabel")
 groups = ["player"]
 z_index = 1
+auto_forward_speed = 200.0
 
 [node name="Sprite" type="Sprite2D" parent="World/Player"]
 texture = ExtResource("2_9n4v1")
@@ -51,7 +53,8 @@ scale = Vector2(0.7, 0.7)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/Player"]
 shape = SubResource("CircleShape2D_h7max")
 
-[node name="Camera2D" type="Camera2D" parent="World/Player"]
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(0, 0)
 current = true
 
 [node name="HUD" type="CanvasLayer" parent="."]

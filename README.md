@@ -2,6 +2,8 @@
 
 Typhoonette is a 2D side-scrolling shooter prototype built with Godot 4.5. You pilot a fledgling storm that grows stronger by absorbing smaller debris and raindrops while avoiding larger threats that can tear it apart.
 
+The current build targets a portrait (720 × 1280) viewport for a classic vertical shooter feel.
+
 ## Project Layout
 
 - `scenes/` – Godot scenes starting with `main.tscn`, the current entry point.
@@ -18,6 +20,7 @@ Typhoonette is a 2D side-scrolling shooter prototype built with Godot 4.5. You p
 
 - Vertical scrolling level controller that keeps the ocean backdrop flowing and spawns floating crates to dodge or shatter.
 - Playable `CharacterBody2D` typhoon with WASD movement, dash burst, and placeholder growth/shrink hooks.
+- Automatic upward drift keeps the storm advancing while soft limits prevent leaving the camera’s view and gently push you away from the bottom edge.
 - Breakable crates that chip away at the typhoon’s mass when you collide with them.
 - Camera that follows the typhoon, simple parallax backdrop, and HUD label showing current mass.
 - Input actions preconfigured in `project.godot` for immediate testing.
@@ -30,7 +33,7 @@ Typhoonette is a 2D side-scrolling shooter prototype built with Godot 4.5. You p
 | Absorb (test mass gain) | J |
 | Dash burst | Space |
 
-Use **J** to simulate absorbing small objects and **Space** to trigger the dash prototype.
+Use **J** to simulate absorbing small objects and **Space** to trigger the dash prototype. Even when pressing **S**, the typhoon keeps pushing forward, so stay nimble inside the visible play space.
 
 ## Getting Started
 
