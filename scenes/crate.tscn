@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/environment/crate_placeholder.tres" id="1_jps1y"]
+[ext_resource type="Script" path="res://scripts/crate.gd" id="2_bh0ja"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vps1y"]
+size = Vector2(48, 48)
+
+[node name="Crate" type="Area2D"]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("2_bh0ja")
+monitoring = true
+monitorable = true
+mass_penalty = 0.7
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_jps1y")
+centered = true
+scale = Vector2(1, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_vps1y")
